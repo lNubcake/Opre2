@@ -1,10 +1,11 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
 
 	public static void main(String[] args) {
 		
-		TextProcessor(getInput());
+		ArrayList<Integer> Tasks = TextProcessor(getInput());
 
 	}
 	
@@ -22,9 +23,17 @@ public class Main {
 		return Result;
 	}
 	
-	public static void/*??*/ TextProcessor(String TextToProcess)
+	public static ArrayList<Integer> TextProcessor(String TextToProcess)
 	{
 		// TODO implement this
+		ArrayList<Integer> Result = new ArrayList<Integer>();
+		
+		String[] split = TextToProcess.split(",");
+		for(String page : split)
+		{
+			Result.add(Integer.parseInt(page));
+		}
+		return Result;
 	}
 
 }
