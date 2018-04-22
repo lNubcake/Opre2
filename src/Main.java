@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Scanner;
@@ -10,7 +12,8 @@ public class Main {
 		ArrayList<Integer> Tasks = TextProcessor(getInput());
 		
 		FifoProcessor(Tasks);
-		System.out.println("ezveszelyes\n6\nezveszelyes\n5");
+		LRUProcessor(Tasks);
+		System.out.println("ezveszelyes\n5");
 
 	}
 	
@@ -45,10 +48,10 @@ public class Main {
 		String memoryReferences = new String("");
 		Integer pageFault = 0;
 		
-		Frame A = new Frame("A");
-		Frame B = new Frame("B");
-		Frame C = new Frame("C");
-		Frame D = new Frame("D");
+		Frame A = new Frame("A",0);
+		Frame B = new Frame("B",0);
+		Frame C = new Frame("C",0);
+		Frame D = new Frame("D",0);
 		
 		// Implement FIFO here
 		Deque<Frame> Fifo = new LinkedList<Frame>();
@@ -76,6 +79,69 @@ public class Main {
 		System.out.println(memoryReferences);
 		System.out.println(pageFault.toString());
 		
+	}
+	
+	public static void LRUProcessor(ArrayList<Integer> Pages)
+	{
+		String memoryReferences = new String("");
+		Integer pageFault = 0;
+		
+		Frame A = new Frame("A",4);
+		Frame B = new Frame("B",3);
+		Frame C = new Frame("C",2);
+		Frame D = new Frame("D",1);
+		
+		ArrayList<Frame> LRU = new ArrayList<Frame>();
+		LRU.add(A);
+		LRU.add(B);
+		LRU.add(C);
+		LRU.add(D);
+		
+		for(Integer page: Pages)
+		{
+		
+			
+			if(isInMemory(page,LRU))
+			{
+				memoryReferences += "-";
+			}
+			else
+			{
+				LRU.get(0).Page = page;
+				memoryReferences += LRU.get(0).Name;
+				pageFault++;
+				LRU.get(0).lastUsage = 1;
+				for(int i = 1; i < LRU.size(); i++)
+				{
+					LRU.get(i).lastUsage++;
+				}
+			}
+			
+			Collections.sort(LRU, new Comparator<Frame>() {
+				@Override
+				public int compare(Frame lhs, Frame rhs){
+					return lhs.lastUsage > rhs.lastUsage ? -1 : (lhs.lastUsage < rhs.lastUsage ? 1 : 0);
+				}
+			});
+		}
+		
+		System.out.println(memoryReferences);
+		System.out.println(pageFault.toString());
+	}
+	
+	public static boolean isInMemory(int num, ArrayList<Frame> container)
+	{
+		boolean Result = false;
+		for(Frame f : container)
+		{
+			if(f.Page == num)
+			{
+				f.lastUsage = 0;
+				Result = true;
+			}
+			f.lastUsage++;
+		}
+		return Result;
 	}
 	
 	public static boolean isInMemory(int num, Deque<Frame> container)
