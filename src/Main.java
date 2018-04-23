@@ -80,9 +80,11 @@ public class Main {
 		
 	}
 	
+
+	static String memoryReferences = new String("");
+	
 	public static void LRUProcessor(ArrayList<Integer> Pages)
 	{
-		String memoryReferences = new String("");
 		Integer pageFault = 0;
 		
 		Frame A = new Frame("A",4);
@@ -100,7 +102,7 @@ public class Main {
 		{
 		
 			
-			if(isInMemory(page,LRU))
+			if(isInMemory(page,LRU,"",-1))
 			{
 				memoryReferences += "-";
 			}
@@ -134,10 +136,10 @@ public class Main {
 		String memoryReferences = new String("");
 		Integer pageFault = 0;
 		
-		Frame A = new Frame("A",5);
-		Frame B = new Frame("B",4);
-		Frame C = new Frame("C",3);
-		Frame D = new Frame("D",2);
+		Frame A = new Frame("A",9);
+		Frame B = new Frame("B",8);
+		Frame C = new Frame("C",7);
+		Frame D = new Frame("D",6);
 		
 		ArrayList<Frame> LRU = new ArrayList<Frame>();
 		LRU.add(A);
@@ -153,22 +155,17 @@ public class Main {
 				{
 					s.Frozen = true;
 				}
+				if(s.lastUsage >= 5)
+				{
+					s.Frozen = false;
+				}
 			}
-			
-			if(isInMemory(page,LRU) )
+	
+			if(isInMemory(page,LRU,memoryReferences, pageFault))
 			{
 				memoryReferences += "-";
 			}
-			else if(LRU.get(0).lastUsage < 5)
-			{
-				memoryReferences += "*";
-				pageFault++;
-				for(Frame f : LRU)
-				{
-					f.lastUsage++;
-				}
-			}
-			else if(LRU.get(0).lastUsage >= 5)
+			else
 			{
 				LRU.get(0).Page = page;
 				memoryReferences += LRU.get(0).Name;
@@ -193,12 +190,18 @@ public class Main {
 		System.out.println(pageFault.toString());
 	}
 	
-	public static boolean isInMemory(int num, ArrayList<Frame> container)
+	public static boolean isInMemory(int num, ArrayList<Frame> container, String str, Integer pf)
 	{
 		boolean Result = false;
 		for(Frame f : container)
 		{
-			if(f.Page == num)
+			if(f.Page == num && f.Frozen == true)
+			{
+				str.concat("*");
+				pf++;
+				return false;
+			}
+			if(f.Page == num && f.Frozen == false)
 			{
 				f.lastUsage = 0;
 				Result = true;
