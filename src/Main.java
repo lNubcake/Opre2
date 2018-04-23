@@ -13,8 +13,7 @@ public class Main {
 		
 		FifoProcessor(Tasks);
 		LRUProcessor(Tasks);
-		System.out.println("ezveszelyes\n5");
-
+		LRUPageLockingProcessor(Tasks);
 	}
 	
 	public static String getInput()
@@ -123,6 +122,71 @@ public class Main {
 					return lhs.lastUsage > rhs.lastUsage ? -1 : (lhs.lastUsage < rhs.lastUsage ? 1 : 0);
 				}
 			});
+		}
+		
+		System.out.println(memoryReferences);
+		System.out.println(pageFault.toString());
+	}
+	
+	public static void LRUPageLockingProcessor(ArrayList<Integer> Pages)
+	{
+
+		String memoryReferences = new String("");
+		Integer pageFault = 0;
+		
+		Frame A = new Frame("A",5);
+		Frame B = new Frame("B",4);
+		Frame C = new Frame("C",3);
+		Frame D = new Frame("D",2);
+		
+		ArrayList<Frame> LRU = new ArrayList<Frame>();
+		LRU.add(A);
+		LRU.add(B);
+		LRU.add(C);
+		LRU.add(D);
+		
+		for(Integer page: Pages)
+		{	
+			for(Frame s : LRU)
+			{
+				if(s.lastUsage < 5)
+				{
+					s.Frozen = true;
+				}
+			}
+			
+			if(isInMemory(page,LRU) )
+			{
+				memoryReferences += "-";
+			}
+			else if(LRU.get(0).lastUsage < 5)
+			{
+				memoryReferences += "*";
+				pageFault++;
+				for(Frame f : LRU)
+				{
+					f.lastUsage++;
+				}
+			}
+			else if(LRU.get(0).lastUsage >= 5)
+			{
+				LRU.get(0).Page = page;
+				memoryReferences += LRU.get(0).Name;
+				pageFault++;
+				LRU.get(0).lastUsage = 1;
+				for(int i = 1; i < LRU.size(); i++)
+				{
+					LRU.get(i).lastUsage++;
+				}
+			}
+
+			Collections.sort(LRU, new Comparator<Frame>() {
+				@Override
+				public int compare(Frame lhs, Frame rhs){
+					return lhs.lastUsage > rhs.lastUsage ? -1 : (lhs.lastUsage < rhs.lastUsage ? 1 : 0);
+				}
+			});
+			
 		}
 		
 		System.out.println(memoryReferences);
